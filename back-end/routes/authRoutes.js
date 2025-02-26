@@ -57,6 +57,7 @@ router.post('/logout', (req, res) => {
 
 // Маршрут для проверки сессии
 router.get('/check-session', (req, res) => {
+    console.log('Session:', req.session);
     if (req.session.userId) {
         res.json({ authenticated: true, user: req.session.user });
     } else {

@@ -21,17 +21,33 @@ export default {
     },
     methods: {
         async login() {
-            try {
-                const response = await axios.post('http://localhost:8080/api/auth/login', this.form, {
-                    withCredentials: true // Для отправки кук
-                });
-                alert('Вы успешно вошли в систему!');
-                this.$store.commit('setUser', response.data.user); // Сохраняем данные пользователя
-                this.$router.push('/');
-            } catch (error) {
-                alert(error.response?.data.message || 'Ошибка входа');
-            }
+    try {
+        const response = await axios.post('http://localhost:8080/api/auth/login', this.form, {
+            withCredentials: true
+        });
+        alert('Вы успешно вошли в систему!');
+
+        try {
+            this.$store.commit('setUser', response.data.user);
+        } catch (storeError) {
+            console.error('Ошибка в сторе:', storeError);
         }
+
+        try {
+            console.log('Current user state:', this.$store.state.user);
+        } catch (logError) {
+            console.error('Ошибка при логировании:', logError);
+        }
+
+        try {
+            this.$router.push('/');
+        } catch (routerError) {
+            console.error('Ошибка в роутере:', routerError);
+        }
+    } catch (error) {
+        alert(error.response?.data.message || 'Ошибка входа');
+    }
+}
     }
 };
 </script>

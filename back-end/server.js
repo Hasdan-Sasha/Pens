@@ -29,7 +29,7 @@ app.use(session({
 }));
 
 // Middleware
-app.use(cors({ credentials: true, origin: 'http://localhost:8080' })); // Укажи origin для кук
+app.use(cors({ credentials: true, origin: 'http://localhost:5173/' })); // Укажи origin для кук
 app.use(express.json());
 app.use(express.static('C:/Users/Xasdan/Desktop/Pens/front-end/front-end-Vue/dist'));
 
@@ -39,9 +39,9 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/auth', authRoutes);
 
 // Перенаправление для Vue Router
-app.get('*', (req, res) => {
-    res.sendFile('C:/Users/Xasdan/Desktop/Pens/front-end/front-end-Vue/dist/index.html');
-});
+// app.get('*', (req, res) => {
+//     res.sendFile('C:/Users/Xasdan/Desktop/Pens/front-end/front-end-Vue/dist/index.html');
+// });
 
 // Обработка ошибок
 app.use((err, req, res, next) => {

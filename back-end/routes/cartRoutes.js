@@ -1,14 +1,13 @@
 // routes/cartRoutes.js
 const express = require('express');
 const router = express.Router();
-const Cart = require('../models/Cart'); // Предполагается, что модель корзины уже создана
+const Cart = require('../models/Cart');
 const Product = require('../models/Product');
-const authenticateToken = require('../middleware/authMiddleware');
+const authenticateSession = require('../middleware/authMiddleware');
 
-// Получение корзины пользователя по ID пользователя
-router.get('/:userId', async (req, res) => {
+router.get('/', authenticateSession, async (req, res) => {
     try {
-        const cart = await Cart.findOne({ user: req.params.userId }).populate('items.product');
+        const cart = await Cart.findOne({ user: req.user.userId }).populate('items.product');
         if (!cart) return res.status(404).json({ message: 'Cart not found' });
         res.json(cart);
     } catch (err) {
@@ -16,13 +15,9 @@ router.get('/:userId', async (req, res) => {
     }
 });
 
-// Добавление товара в корзину
-// routes/cartRoutes.js
-router.post('/:userId/add/:productId', authenticateToken, async (req, res) => {
-    const userId = req.params.userId;
+router.post('/add/:productId', authenticateSession, async (req, res) => {
+    const userId = req.user.userId;
     const productId = req.params.productId;
-
-
 
     try {
         let cart = await Cart.findOne({ user: userId });
@@ -35,22 +30,22 @@ router.post('/:userId/add/:productId', authenticateToken, async (req, res) => {
 
         const itemIndex = cart.items.findIndex(item => item.product.toString() === productId);
         if (itemIndex >= 0) {
-            cart.items[itemIndex].quantity += 1; // Увеличить количество, если товар уже есть
+            cart.items[itemIndex].quantity += 1;
         } else {
-            cart.items.push({ product: productId, quantity: 1} ); // Добавить новый товар
+            cart.items.push({ product: productId, quantity: 1 });
         }
 
         await cart.save();
         res.json(cart);
     } catch (err) {
-        console.error('Error adding product to cart:', err.message, err.stack); // Подробное логирование
+        console.error('Error adding product to cart:', err);
         res.status(500).json({ message: 'Failed to add product to cart' });
     }
 });
 
-// Обновление количества товара в корзине
-router.put('/:userId/update/:productId', authenticateToken, async (req, res) => {
-    const userId = req.params.userId;
+// Остальные маршруты (update, remove, clear) обновляются аналогично
+router.put('/update/:productId', authenticateSession, async (req, res) => {
+    const userId = req.user.userId;
     const productId = req.params.productId;
     const { quantity } = req.body;
 
@@ -73,9 +68,8 @@ router.put('/:userId/update/:productId', authenticateToken, async (req, res) => 
     }
 });
 
-// Удаление товара из корзины
-router.delete('/:userId/remove/:productId', authenticateToken, async (req, res) => {
-    const userId = req.params.userId;
+router.delete('/remove/:productId', authenticateSession, async (req, res) => {
+    const userId = req.user.userId;
     const productId = req.params.productId;
 
     try {
@@ -93,9 +87,8 @@ router.delete('/:userId/remove/:productId', authenticateToken, async (req, res) 
     }
 });
 
-// Очистка корзины
-router.delete('/:userId/clear', authenticateToken, async (req, res) => {
-    const userId = req.params.userId;
+router.delete('/clear', authenticateSession, async (req, res) => {
+    const userId = req.user.userId;
 
     try {
         const cart = await Cart.findOne({ user: userId });

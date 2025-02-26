@@ -3,9 +3,10 @@
   <div id="app">
     <header class="app-header">
       <div><router-link to="/cart" class="header-button">Корзина</router-link></div>
-      <router-link to="/"><img src="C:/Users/Xasdan/Desktop/Pens/front-end/front-end-Vue/public/Logo.png" alt="" class="logo"></router-link>
+      <router-link to="/"><img src="/Logo.png" alt="Logo" class="logo"></router-link>
       <div>
-        <router-link to="/Auth" class="header-button"><div><p>Вход/Регистрация</p></div></router-link>
+        <router-link to="/login" class="header-button">Вход</router-link>
+        <router-link to="/register" class="header-button">Регистрация</router-link>
       </div>
     </header>
     <main class="app-main">
@@ -20,41 +21,23 @@
   text-align: center;
   color: #2c3e50;
 }
-.logo{
+.logo {
   width: 20%;
 }
-
 .app-header {
   background-color: #ffffff;
   color: white;
   display: flex;
-  justify-content:space-between;
+  justify-content: space-between;
   flex-direction: row;
   padding: 15px 20px;
 }
-
-.app-title {
-  font-size: 24px;
-  margin: 0;
-}
-
-.app-nav {
-  margin-top: 10px;
-}
-
-.nav-link {
-  color: white;
-  text-decoration: none;
-  margin: 0 10px;
-  font-size: 16px;
-  transition: color 0.3s ease;
-}
-
-.nav-link:hover {
-  color: #ecf0f1;
-}
-
 .app-main {
   padding: 20px;
+}
+.header-button {
+  color: black;
+  text-decoration: none;
+  margin: 0 10px;
 }
 </style>

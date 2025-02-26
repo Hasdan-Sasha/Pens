@@ -48,6 +48,8 @@
   </div>
 </template>
 
+<!-- src/components/ProductList.vue -->
+<!-- Шаблон остаётся тем же, обновлю только <script> -->
 <script>
 import axios from 'axios';
 
@@ -56,19 +58,15 @@ export default {
     return {
       products: [],
       searchQuery: '',
-      hoveredProductId: null, // Controls the visibility of the info box
+      hoveredProductId: null,
     };
   },
   computed: {
     groupedProducts() {
-      if (!Array.isArray(this.products)) {
-        return {};
-      }
+      if (!Array.isArray(this.products)) return {};
       return this.products.reduce((groups, product) => {
         const type = product.type;
-        if (!groups[type]) {
-          groups[type] = [];
-        }
+        if (!groups[type]) groups[type] = [];
         groups[type].push(product);
         return groups;
       }, {});
@@ -88,25 +86,18 @@ export default {
       console.log('Поиск по запросу:', this.searchQuery);
     },
     async addToCart(productId) {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('Для добавления товара в корзину необходимо войти в систему.');
-        return;
-      }
-
-      const decodedToken = JSON.parse(atob(token.split('.')[1]));
-      const userId = decodedToken.userId;
-
       try {
-        await axios.post(`http://localhost:8080/api/cart/${userId}/add/${productId}`, {}, {
-          headers: { Authorization: `Bearer ${token}` }
+        await axios.post(`http://localhost:8080/api/cart/add/${productId}`, {}, {
+          withCredentials: true
         });
         alert('Товар добавлен в корзину!');
       } catch (error) {
-        if (error.response) {
-          alert(error.response.data.message);
+        if (error.response?.status === 401) {
+          alert('Пожалуйста, войдите в систему.');
+          this.$router.push('/login');
+        } else {
+          alert(error.response?.data.message || 'Ошибка при добавлении в корзину');
         }
-        console.error('Ошибка при добавлении товара в корзину:', error);
       }
     },
   },

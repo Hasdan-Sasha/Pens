@@ -28,41 +28,31 @@ export default {
     },
   },
   async created() {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-    const userId = localStorage.getItem('userId'); // Получаем userId из localStorage
-    if (!userId) {
-      console.error('User ID not found');
-      return;
-}
-
     try {
-      const response = await axios.get(`http://localhost:8080/api/cart/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const response = await axios.get('http://localhost:8080/api/cart', {
+        withCredentials: true
       });
-      this.cartItems = response.data.items;
+      this.cartItems = response.data.items || [];
     } catch (error) {
       console.error('Ошибка при загрузке корзины:', error);
     }
   },
   methods: {
     async removeFromCart(productId) {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
       try {
         await axios.delete(`http://localhost:8080/api/cart/remove/${productId}`, {
-          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true
         });
-        this.cartItems = this.cartItems.filter((item) => item.product._id !== productId);
+        this.cartItems = this.cartItems.filter(item => item.product._id !== productId);
         alert('Товар удален из корзины!');
       } catch (error) {
-        console.error('Ошибка при удалении товара из корзины:', error);
+        console.error('Ошибка при удалении товара:', error);
       }
     },
   },
 };
 </script>
+<!-- Стили остаются без изменений -->
 <style scoped>
 .cart-container {
   max-width: 800px;

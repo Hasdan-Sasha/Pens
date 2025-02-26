@@ -3,22 +3,17 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const Cart = require('../models/Cart');
-// routes/authRoutes.js (продолжение)
-const jwt = require('jsonwebtoken');
 
 router.post('/register', async (req, res) => {
     const { name, email, password } = req.body;
 
     try {
-        // Проверяем, существует ли пользователь с таким email
         const existingUser = await User.findOne({ email });
         if (existingUser) return res.status(400).json({ message: 'Email already exists' });
 
-        // Создаем нового пользователя
         const user = new User({ name, email, password });
         await user.save();
 
-        // Создаем пустую корзину для пользователя
         const cart = new Cart({ user: user._id, items: [] });
         await cart.save();
 
@@ -29,26 +24,43 @@ router.post('/register', async (req, res) => {
     }
 });
 
-
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        // Находим пользователя по email
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ message: 'Invalid credentials' });
 
-        // Проверяем пароль
         const isMatch = await user.comparePassword(password);
         if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
-        // Генерируем JWT токен
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        // Сохраняем данные пользователя в сессии
+        req.session.userId = user._id;
+        req.session.user = { name: user.name, email: user.email };
 
-        res.json({ token, user: { name: user.name, email: user.email } });
+        res.json({ message: 'Logged in successfully', user: req.session.user });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server error' });
+    }
+});
+
+router.post('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).json({ message: 'Could not log out' });
+        }
+        res.clearCookie('connect.sid'); // Очищаем куку сессии
+        res.json({ message: 'Logged out successfully' });
+    });
+});
+
+// Маршрут для проверки сессии
+router.get('/check-session', (req, res) => {
+    if (req.session.userId) {
+        res.json({ authenticated: true, user: req.session.user });
+    } else {
+        res.json({ authenticated: false });
     }
 });
 

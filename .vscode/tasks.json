@@ -1,0 +1,26 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "build",
+			"path": "front-end/front-end-Vue",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [],
+			"label": "npm: build - front-end/front-end-Vue",
+			"detail": "vite build"
+		},
+		{
+			"type": "npm",
+			"script": "dev",
+			"path": "front-end/front-end-Vue",
+			"problemMatcher": [],
+			"label": "npm: dev - front-end/front-end-Vue",
+			"detail": "vite",
+			"group": "build"
+		}
+	]
+}
